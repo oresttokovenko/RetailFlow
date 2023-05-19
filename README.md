@@ -8,19 +8,23 @@ RetailFLow is an end-to-end ELT data engineering project that aims to generate f
 
 ```mermaid
 graph LR
+  L["AWS Lambda"]
   subgraph EC2_1["EC2 Instance"]
   P["Postgres DB"]
   end
   subgraph EC2_2["EC2 Instance"]
   A["Airbyte"]
   end
+  subgraph EC2_5["Hosted on AWS"]
   S["Snowflake"]
+  end
   subgraph EC2_3["EC2 Instance"]
-  D["dbt"]
+  D["dbt + Airbyte"]
   end
   subgraph EC2_4["EC2 Instance"]
   M["Metabase"]
   end
+  L -- "Generates Fake Data" --> P
   P -- "Data Ingestion" --> A
   A -- "Data Loading" --> S
   S -- "Data Transformation" --> D
@@ -31,6 +35,14 @@ graph LR
   linkStyle 2 stroke:#2ecd71,stroke-width:2px;
   linkStyle 3 stroke:#2ecd71,stroke-width:2px;
   linkStyle 4 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 5 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 0 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 1 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 2 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 3 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 4 stroke:#2ecd71,stroke-width:2px;
+  linkStyle 5 stroke:#2ecd71,stroke-width:2px;
+
 
 
 ```
@@ -67,3 +79,8 @@ graph LR
     └── dags
         └── test_dag_validity.py
 ```
+
+## Additional Tasks
+
+- Collect Airbyte logs in CloudWatch
+- Add Linting with sqlfluff
