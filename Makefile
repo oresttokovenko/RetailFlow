@@ -1,5 +1,5 @@
 ####################################################################################################################
-# Setup containers to run Airflow
+# Setup containers to run Dagster
 
 docker-spin-up:
 	docker compose --env-file env up airflow-init && docker compose --env-file env up --build -d
