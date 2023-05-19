@@ -1,8 +1,7 @@
 name: CD
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [created]
 jobs:
   deploy-to-ec2:
     runs-on: ubuntu-latest
