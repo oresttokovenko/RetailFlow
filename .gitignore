@@ -24,6 +24,8 @@ sftp-config.json
 
 # Python
 __pycache__
+retailflow_venv
+.env
 
 # policy
 trust-policy.json

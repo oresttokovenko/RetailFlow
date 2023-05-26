@@ -19,7 +19,7 @@ graph LR
   S["Snowflake"]
   end
   subgraph EC2_3["EC2 Instance"]
-  D["dbt + Airbyte"]
+  D["dbt + Dagster"]
   end
   subgraph EC2_4["EC2 Instance"]
   M["Metabase"]
@@ -53,31 +53,25 @@ graph LR
 
 ```
 .
+.
 ├── INSTRUCTIONS.md
 ├── LICENSE
 ├── Makefile
 ├── README.md
 ├── assets
 │   └── images
-│       ├── infra.png
-│       ├── proj_1.png
-│       └── proj_2.png
-├── containers
-│   └── airflow
-│       ├── Dockerfile
-│       └── requirements.txt
-├── dags
-├── docker-compose.yml
 ├── env
-├── migrations
-│   └── temp.py
+├── generate
+│   └── generate_fake_data.py
+├── ingestion
+├── requirements.txt
+├── retailflow_venv
 ├── terraform
-│   ├── main.tf
-│   ├── output.tf
-│   └── variable.tf
-└── tests
-    └── dags
-        └── test_dag_validity.py
+│   └── main.tf
+├── transformation
+│   ├── dagster_dags
+│   └── dbt
+└── visualization
 ```
 
 ## Additional Tasks
