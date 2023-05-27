@@ -78,3 +78,4 @@ graph LR
 
 - Collect Airbyte logs in CloudWatch
 - Add Linting with sqlfluff
+- Dockerize everything
