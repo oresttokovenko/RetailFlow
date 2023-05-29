@@ -16,7 +16,7 @@ def generate_fake_data():
 
     for i in range(1, num_records+1):
         order_id = i
-        name = fake.name()
+        cust_name = fake.name()
         product = fake.bs()   # just generating random product names
         product_category = random.choice(product_categories)
         quantity = random.randint(1, 10)
@@ -32,7 +32,7 @@ def generate_fake_data():
         country = 'Canada'
 
         data.append(pd.DataFrame({'order_id': [order_id],
-                                    'name': [name],
+                                    'cust_name': [cust_name],
                                     'product': [product],
                                     'product_category': [product_category],
                                     'quantity': [quantity],
@@ -59,7 +59,8 @@ def create_db_connection():
 def push_data_to_db():
     # TODO: use sqlalchemy to push fake data to db 
     # https://docs.sqlalchemy.org/en/20/core/dml.html
+    # INSERT INTO sales VALUES([order_id], [cust_name]...);
     pass
 
 result = generate_fake_data()
-print(result)
+result.describe()

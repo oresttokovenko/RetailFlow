@@ -48,6 +48,7 @@ __MACOSX
 ###### TERRAFORM IGNORE
 # Local .terraform directories
 **/.terraform/*
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
