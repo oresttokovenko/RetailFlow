@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=<your_user>
+      - POSTGRES_PASSWORD=<your_password>
+      - POSTGRES_DB=<your_db>
+
+  airbyte:
+    image: airbyte/server:latest
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+
+  dagster_dbt:
+    build: ./path_to_dockerfile_folder/dagster_dbt
+    volumes:
+      - .:/dagster_dbt
+    ports:
+      - "3000:3000"
+    command: <your_command_to_run_both_services>
+
+  metabase:
+    image: metabase/metabase:latest
+    ports:
+      - "3001:3000"

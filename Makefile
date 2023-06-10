@@ -1,4 +1,26 @@
 ####################################################################################################################
+# Setup local environment for testing
+
+# creates a virtual environment and installs requirements
+setup: 
+	create-virtualenv install-requirements
+
+# creates a new virtual environment using Python 3.10
+create-virtualenv:
+	@echo "Creating virtual environment with python3.10..."
+	test -d retailflow_venv || python3.10 -m venv retailflow_venv
+
+# activates the virtual environment and installs the required packages
+install-requirements:
+	@echo "Installing requirements..."
+	. retailflow_venv/bin/activate && pip install -r requirements.txt
+
+# clean: removes the virtual environment directory
+clean:
+	@echo "Cleaning up virtual environment..."
+	rm -rf retailflow_venv
+
+####################################################################################################################
 # Setup containers to run pipeline
 
 docker-spin-up:
