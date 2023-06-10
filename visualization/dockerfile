@@ -1,0 +1,15 @@
+FROM metabase/metabase:latest
+
+# set environment variables (update as needed)
+ENV MB_DB_TYPE=postgres
+ENV MB_DB_DBNAME=my_metabase_db
+ENV MB_DB_PORT=5432
+ENV MB_DB_USER=my_metabase_user
+ENV MB_DB_PASS=my_metabase_pass
+ENV MB_DB_HOST=my_database_host
+
+# metabase runs on port 3000 by default
+EXPOSE 3000
+
+# the default command to start Metabase
+CMD ["/app/run_metabase.sh"]

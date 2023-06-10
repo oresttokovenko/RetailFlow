@@ -8,21 +8,36 @@ RetailFLow is an end-to-end ELT data engineering project that aims to generate f
 
 ```mermaid
 graph LR
-  L["AWS Lambda"]
+  subgraph L["AWS Lambda"]
+    style L fill:#e8fce8
+    LA["generate_fake_data.py"]
+  end
   subgraph EC2_1["EC2 Instance"]
-  P["Postgres DB"]
+    subgraph D1["Docker"]
+      style D1 fill:#d4ebf2
+      P["Postgres DB"]
+    end
   end
   subgraph EC2_2["EC2 Instance"]
-  A["Airbyte"]
+    subgraph D2["Docker"]
+      style D2 fill:#d4ebf2
+      A["Airbyte"]
+    end
   end
   subgraph EC2_5["Hosted on AWS"]
-  S["Snowflake"]
+      S["Snowflake"]
   end
   subgraph EC2_3["EC2 Instance"]
-  D["dbt + Dagster"]
+    subgraph D3["Docker"]
+      style D3 fill:#d4ebf2
+      D["dbt +  Dagster"]
+    end
   end
   subgraph EC2_4["EC2 Instance"]
-  M["Metabase"]
+    subgraph D4["Docker"]
+      style D4 fill:#d4ebf2
+      M["Metabase"]
+    end
   end
   L -- "Generates Fake Data" --> P
   P -- "Data Ingestion" --> A
@@ -30,21 +45,14 @@ graph LR
   S -- "Data Transformation" --> D
   D -- "Data Transformation" --> S
   S -- "Data Visualization" --> M
-  linkStyle 0 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 1 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 2 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 3 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 4 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 5 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 0 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 1 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 2 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 3 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 4 stroke:#2ecd71,stroke-width:2px;
-  linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 
 
-
+linkStyle 0 stroke:#2ecd71,stroke-width:2px;
+linkStyle 1 stroke:#2ecd71,stroke-width:2px;
+linkStyle 2 stroke:#2ecd71,stroke-width:2px;
+linkStyle 3 stroke:#2ecd71,stroke-width:2px;
+linkStyle 4 stroke:#2ecd71,stroke-width:2px;
+linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 ```
 
 <br>
@@ -53,29 +61,32 @@ graph LR
 
 ```
 .
-.
-├── INSTRUCTIONS.md
-├── LICENSE
 ├── Makefile
 ├── README.md
 ├── assets
 │   └── images
-├── env
+├── docker-compose.yml
 ├── generate
 │   └── generate_fake_data.py
 ├── ingestion
-├── requirements.txt
+│   └── airbyte
 ├── retailflow_venv
+├── storage
+│   ├── postgres
+│   └── snowflake
 ├── terraform
-│   └── main.tf
+│   ├── compute.tf
+│   ├── db.tf
+│   └── variables.tf
 ├── transformation
-│   ├── dagster_dags
-│   └── dbt
+│   ├── dagster
+│   ├── dbt
+│   └── dockerfile
 └── visualization
+    └── dockerfile
 ```
 
 ## Additional Tasks
 
 - Collect Airbyte logs in CloudWatch
 - Add Linting with sqlfluff
-- Dockerize everything

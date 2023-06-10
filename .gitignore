@@ -43,6 +43,8 @@ __MACOSX
 
 .dockerignore
 
+INSTRUCTIONS.md
+
 *.pem
 
 ###### TERRAFORM IGNORE

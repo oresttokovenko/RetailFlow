@@ -60,6 +60,7 @@ def push_data_to_db():
     # TODO: use sqlalchemy to push fake data to db 
     # https://docs.sqlalchemy.org/en/20/core/dml.html
     # INSERT INTO sales VALUES([order_id], [cust_name]...);
+    # if connection fails, dump data to s3
     pass
 
 result = generate_fake_data()
