@@ -1,28 +1,24 @@
 version: "3.9"
 services:
+  generate_fake_data:
+    build: generate/Dockerfile
+
   postgres:
-    image: postgres:latest
-    environment:
-      - POSTGRES_USER=<your_user>
-      - POSTGRES_PASSWORD=<your_password>
-      - POSTGRES_DB=<your_db>
+    build: storage/postgres/Dockerfile
+    depends_on:
+      - generate_fake_data
 
   airbyte:
-    image: airbyte/server:latest
+    build: ingestion/airbyte/Dockerfile
     depends_on:
       - postgres
-    ports:
-      - "8000:8000"
 
   dagster_dbt:
-    build: ./path_to_dockerfile_folder/dagster_dbt
-    volumes:
-      - .:/dagster_dbt
-    ports:
-      - "3000:3000"
-    command: <your_command_to_run_both_services>
+    build: ./transformation/Dockerfile
+    depends_on:
+      - airbyte
 
   metabase:
-    image: metabase/metabase:latest
-    ports:
-      - "3001:3000"
+    build: ./visualization/Dockerfile
+    depends_on:
+      - dagster_dbt
