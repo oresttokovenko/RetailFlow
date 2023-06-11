@@ -96,7 +96,46 @@ linkStyle 5 stroke:#2ecd71,stroke-width:2px;
     └── dockerfile
 ```
 
-## Additional Tasks
+## Requirements
 
-- Collect Airbyte logs in CloudWatch
-- Add Linting with sqlfluff
+1. AWS Account
+2. AWS CLI (installed and configured)
+3. Docker
+4. Terraform
+
+You can install these requirements using the following command: `brew install docker awscli terraform`
+
+## Set Up
+
+```shell
+# Local run & test
+make infra-up-local # start the docker containers on your computer
+
+# Create AWS services with Terraform and AWS ECS
+make tf-init # Only needed on your first terraform run (or if you add new providers)
+make infra-up # type in yes after verifying the changes TF will make
+
+# Wait until the EC2 instance is initialized, you can check this via your AWS UI
+# See "Status Check" on the EC2 console, it should be "2/2 checks passed" before proceeding
+
+make cloud-postgres # this command will forward Postgres port from EC2 to your machine and opens pgadmin in the browser
+# the user name and password are both admin
+
+make cloud-dagster # this command will forward Airflow port from EC2 to your machine and opens it in the browser
+# the user name and password are both admin
+
+make cloud-metabase # this command will forward Metabase port from EC2 to your machine and opens it in the browser
+# the user name and password are both admin
+
+make cloud-dbt # this command will forward dbt port from EC2 to your machine and opens it in the browser
+# the user name and password are both admin
+```
+
+## Tear Down
+
+After you are done, make sure to destroy your cloud infrastructure.
+
+```shell
+make infra-down-local # Stop docker containers on your computer
+make infra-down # type in yes after verifying the changes TF will make
+```
