@@ -2,7 +2,17 @@
 
 ## Description
 
-RetailFLow is an end-to-end ELT data engineering project that aims to generate fake retail sales data for an e-commerce store using a Python script on AWS Lambda, push it to a PostgreSQL DB running on an EC2 instance, ingest it into Snowflake using Airbyte also running on an EC2 instance, orchestrate and perform the data transformations using Dagster and dbt also running on its own EC2 instance, and visualize the data using Metabase also running on its own EC2 instance. This project will be deployed on AWS infrastructure using Terraform and managed on the application level by Docker and AWS ECS.
+RetailFlow is a comprehensive ELT (Extract, Load, Transform) project designed to simulate the flow of retail sales data for an e-commerce platform. The infrastructure is provisioned and managed on AWS, with each service optimized for its specific role in the pipeline.
+
+The data simulation is handled by a Python script executing within an AWS Lambda function. The generated data is then pushed to a PostgreSQL database instance deployed on AWS EC2.
+
+Data is ingested using Airbyte into the data warehousing solution, Snowflake. Airbyte operates on its own EC2 instance, ensuring dedicated resources for the critical task of data synchronization.
+
+For the transformation phase, we utilize a combination of Dagster and dbt, two cutting-edge tools in the data engineering ecosystem. These tools are deployed on an EC2 instance, allowing for a flexible and powerful transformation process.
+
+The final piece of the pipeline is data visualization, which is handled by Metabase. Running on a dedicated EC2 instance, Metabase provides intuitive and insightful data analytics, allowing stakeholders to extract meaningful conclusions from the data.
+
+The entire system is orchestrated using Terraform, an Infrastructure as Code (IaC) tool that simplifies and standardizes infrastructure deployment. On the application level, we utilize Docker for containerization, ensuring consistency across all stages of development and production. Finally, the orchestration of our Docker containers across multiple EC2 instances is managed by AWS ECS (Elastic Container Service), providing a robust, scalable, and efficient solution to our multi-container deployment needs.
 
 ## Data Infrastructure
 
