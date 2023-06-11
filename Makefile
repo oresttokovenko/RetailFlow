@@ -83,13 +83,16 @@ cloud-dagster:
 	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o "IdentitiesOnly yes" -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) -N -f -L 8081:$$(terraform -chdir=./terraform output -raw ec2_public_dns):8080 && open http://localhost:8081 && rm private_key.pem
 
 cloud-snowflake:
-	opens snowflake login window
+	# opens snowflake login window
 
 cloud-postgres:
 	opens pgadmin
 
 ####################################################################################################################
 # Helpers
+
+create_dbt_file:
+	mkdir -p ~/.dbt && touch ~/.dbt/profiles.yml
 
 ssh-ec2:
 	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem

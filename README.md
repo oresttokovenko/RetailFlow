@@ -102,9 +102,10 @@ linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 
 1. AWS Account
 2. AWS CLI (installed and configured)
-3. Docker
-4. docker-compose
-5. Terraform
+3. Create a Snowflake account and note down the account_id, username and password
+4. Docker
+5. docker-compose
+6. Terraform
 
 You can install these requirements using the following command: `brew install docker docker-compose awscli terraform`
 
