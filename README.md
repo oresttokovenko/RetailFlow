@@ -87,8 +87,7 @@ linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 │   ├── postgres
 │   └── snowflake
 ├── terraform
-│   ├── compute.tf
-│   ├── db.tf
+│   ├── main.tf
 │   └── variables.tf
 ├── transformation
 │   ├── Dockerfile
