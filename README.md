@@ -12,7 +12,7 @@ For the transformation phase, we utilize a combination of Dagster and dbt, two c
 
 The final piece of the pipeline is data visualization, which is handled by Metabase. Running on a dedicated EC2 instance, Metabase provides intuitive and insightful data analytics, allowing stakeholders to extract meaningful conclusions from the data.
 
-The entire system is orchestrated using Terraform, an Infrastructure as Code (IaC) tool that simplifies and standardizes infrastructure deployment. On the application level, we utilize Docker for containerization, ensuring consistency across all stages of development and production. Finally, the orchestration of our Docker containers across multiple EC2 instances is managed by AWS ECS (Elastic Container Service), providing a robust, scalable, and efficient solution to our multi-container deployment needs.
+The entire system is orchestrated using Terraform, an Infrastructure as Code (IaC) tool that simplifies and standardizes infrastructure deployment. On the application level, we utilize Docker for containerization, ensuring consistency across all stages of development and production.
 
 ## Data Infrastructure
 
@@ -110,8 +110,6 @@ You can install these requirements using the following command: `brew install do
 
 ## Set Up
 
-You can run the data pipeline locally on your machine using docker-compose or on AWS using Elastic Container Service. Note that using ECS itself incurs no charge, but using EC2 does, so ensure that you tear down the cloud infrastructure once you are done. 
-
 **For local runs only**: Run the following SQL query against your Snowflake data warehouse so that it can prepare to receive the data that Airbyte will send to it.
 
 ```sql
@@ -122,6 +120,7 @@ comment = 'a schema for the retailflow data';
 grant usage on schema "example_database"."example_schema" to role "example_role";
 ```
 
+**NOTE**: the makefile commands below do not yet function
 
 ```shell
 # local run & test using docker-compose
