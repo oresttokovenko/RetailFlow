@@ -110,7 +110,18 @@ You can install these requirements using the following command: `brew install do
 
 ## Set Up
 
-You can run the data pipeline locally or on AWS. 
+You can run the data pipeline locally on your machine using docker-compose or on AWS using Elastic Container Service. Note that using ECS itself incurs no charge, but using EC2 does, so ensure that you tear down the cloud infrastructure once you are done. 
+
+**For local runs only**: Run the following SQL query against your Snowflake data warehouse so that it can prepare to receive the data that Airbyte will send to it.
+
+```sql
+create role "example_role";
+create database "example_database";
+create schema "example_database"."example_schema"
+comment = 'a schema for the retailflow data';
+grant usage on schema "example_database"."example_schema" to role "example_role";
+```
+
 
 ```shell
 # local run & test using docker-compose
