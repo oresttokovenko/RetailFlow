@@ -110,15 +110,7 @@ You can install these requirements using the following command: `brew install do
 
 ## Set Up
 
-**For local runs only**: Run the following SQL query against your Snowflake data warehouse so that it can prepare to receive the data that Airbyte will send to it.
-
-```sql
-create role "example_role";
-create database "example_database";
-create schema "example_database"."example_schema"
-comment = 'a schema for the retailflow data';
-grant usage on schema "example_database"."example_schema" to role "example_role";
-```
+**For local runs only (this is automated on the AWS run)**: Run the following SQL query at `storage/snowflake/snowflake_db.sql` against your Snowflake data warehouse so that it can prepare to receive the data that Airbyte will send to it.
 
 **NOTE**: the makefile commands below do not yet function
 

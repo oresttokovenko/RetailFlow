@@ -1,2 +1,5 @@
 dbt-core==1.5
 dbt-snowflake==1.5.1
+dagit==1.3.6
+dagster==1.3.6
+dagster-graphql==1.3.6

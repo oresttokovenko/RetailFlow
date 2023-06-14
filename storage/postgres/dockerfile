@@ -1,3 +1,10 @@
-FROM ubuntu:jammy
+# parent image
+FROM postgres:15.3
 
-RUN echo "Hello World"
+# environment variables
+ENV POSTGRES_USER myuser
+ENV POSTGRES_PASSWORD mypassword
+ENV POSTGRES_DB mydatabase
+
+# expose port
+EXPOSE 5432

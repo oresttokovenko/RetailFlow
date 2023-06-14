@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### this bash script will run inside of an ec2 instance ###
+
 # update system packages
 yum update -y
 
