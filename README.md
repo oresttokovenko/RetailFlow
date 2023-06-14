@@ -29,10 +29,7 @@ graph LR
     end
   end
   subgraph EC2_2["EC2 Instance"]
-    subgraph D2["Docker"]
-      style D2 fill:#d4ebf2
       A["Airbyte"]
-    end
   end
   subgraph EC2_5["Hosted on AWS"]
       S["Snowflake"]
