@@ -1,21 +1,25 @@
-
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: staging_sales
+    description: "staging model for the postgres sales data"
     columns:
-      - name: id
+      - name: order_id
         description: "The primary key for this table"
         tests:
           - unique
           - not_null
-
-  - name: my_second_dbt_model
-    description: "A starter dbt model"
-    columns:
-      - name: id
-        description: "The primary key for this table"
-        tests:
-          - unique
-          - not_null
+      - name: cust_name
+      - name: product
+      - name: product_category
+      - name: quantity
+      - name: province
+      - name: purchased_at
+      - name: product_id
+      - name: customer_id
+      - name: order_date_at
+      - name: discount
+      - name: shipping_cost
+      - name: city
+      - name: province
+      - name: country

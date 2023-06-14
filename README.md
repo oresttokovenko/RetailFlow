@@ -108,11 +108,21 @@ linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 
 You can install these requirements using the following command: `brew install docker docker-compose awscli terraform`
 
-## Set Up
+## Instructions
 
-**For local runs only (this is automated on the AWS run)**: Run the following SQL query at `storage/snowflake/snowflake_db.sql` against your Snowflake data warehouse so that it can prepare to receive the data that Airbyte will send to it.
+### Local Run
+
+1. Run the SQL query at `storage/snowflake/snowflake_db.sql` against your Snowflake data warehouse so that it can prepare to receive the data that Airbyte will send to it.
+2. run `make infra-up-local`
+3. 
+
+### Cloud Run
 
 **NOTE**: the makefile commands below do not yet function
+
+## Commands
+
+### Provision
 
 ```shell
 # local run & test using docker-compose
@@ -120,7 +130,7 @@ make infra-up-local # start docker containers on your computer
 
 # create AWS services with Terraform and AWS ECS
 make tf-init # only needed on your first terraform run (or if you add new providers)
-make infra-up # type in yes after verifying the changes TF will make
+make infra-up-cloud # type in yes after verifying the changes TF will make
 
 # Wait until the ECS is initialized, you can check this via your AWS UI
 # See "Status Check" on the EC2 console, it should be "2/2 checks passed" before proceeding
@@ -142,7 +152,7 @@ make cloud-dbt
 # the user name and password are both admin
 ```
 
-## Tear Down
+### Tear Down
 
 After you are done, make sure to destroy your cloud infrastructure.
 
@@ -151,5 +161,5 @@ After you are done, make sure to destroy your cloud infrastructure.
 make infra-down-local # stop docker containers on your computer
 
 # AWS infrastructure tear down
-make infra-down # type in yes after verifying the changes TF will make
+make infra-down-cloud # type in yes after verifying the changes TF will make
 ```
