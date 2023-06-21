@@ -90,6 +90,7 @@ s3transfer==0.6.1
 six==1.16.0
 sniffio==1.3.0
 snowflake-connector-python==3.0.3
+snowflake-sqlalchemy==1.4.7
 SQLAlchemy==1.4.48
 sqlparse==0.4.3
 starlette==0.27.0

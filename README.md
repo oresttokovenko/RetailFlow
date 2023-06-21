@@ -122,6 +122,10 @@ You can install these requirements using the following command: `brew install do
 ### Provision
 
 ```shell
+
+# # set up Snowflake credentials
+make snowflake_config
+
 # local run & test using docker-compose
 make infra-up-local # start docker containers on your computer
 

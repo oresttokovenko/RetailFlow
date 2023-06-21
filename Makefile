@@ -5,12 +5,6 @@ help: ## Print all commands (including this one)
 
 ####################################################################################################################
 
-# Setup local environment for testing
-
-snowflake_config: ## Set up Snowflake credentials
-	@echo "Please complete the following:"
-	@python setup.py
-
 setup: ## Create a virtual environment and installs requirements
 	create-virtualenv install-requirements
 
@@ -18,13 +12,11 @@ create-virtualenv:
 	@echo "Creating virtual environment with python3.10..."
 	test -d retailflow_venv || python3.10 -m venv retailflow_venv
 
-# activates the virtual environment and installs the required packages
 install-requirements:
 	@echo "Installing requirements..."
 	. retailflow_venv/bin/activate && pip install -r requirements.txt
 
-# clean: removes the virtual environment directory
-clean:
+clean: ## clean: removes the virtual environment directory
 	@echo "Cleaning up virtual environment..."
 	rm -rf retailflow_venv
 
@@ -48,6 +40,12 @@ sh:
 
 ####################################################################################################################
 
+snowflake_config: ## Set up Snowflake credentials and prepare Snowflake for Airbyte connection
+	@echo "Please complete the following:"
+	@python setup.py
+	@echo "Please wait while the Snowflake setup script runs"
+	@python storage/snowflake/setup_airbyte_environment.py
+	@echo "Setup script is complete - you can proceed to run `tf-init`"
 
 tf-init: ## Run `terraform init`, which needs to be run before `infra-up`
 	terraform -chdir=./terraform init
@@ -75,6 +73,9 @@ cloud-snowflake: ## Access the Snowflake GUI through your local browswer
 
 cloud-dbt: ## Access the Snowflake GUI through your local browswer
 	dbt docs generate
+
+print-lambda: ## Access the Snowflake GUI through your local browswer
+	aws lambda get-function --function-name generate_fake_data.py
 
 ####################################################################################################################
 # Helpers
