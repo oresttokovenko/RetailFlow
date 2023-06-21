@@ -1,9 +1,8 @@
 version: 2
 
 sources:
-  - name: jaffle_shop
-    database: raw  
-    schema: jaffle_shop  
+  - name: airbyte
+    database: postgres_prod  
+    schema: production  
     tables:
-      - name: orders
-      - name: customers
+      - name: sales

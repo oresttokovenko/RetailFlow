@@ -25,4 +25,12 @@ CREATE TABLE production.sales (
 
 -- credentials for airbyte
 
-CREATE USER 'airbyte'@'%' IDENTIFIED BY 'password';
+CREATE USER airbyte_user PASSWORD password;
+
+GRANT USAGE ON SCHEMA production TO airbyte_user;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA production TO airbyte_user;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA production GRANT SELECT ON TABLES TO airbyte_user;
+
+ALTER USER airbyte_user REPLICATION;

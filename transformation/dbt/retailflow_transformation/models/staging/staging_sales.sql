@@ -1,6 +1,6 @@
 with source as (
 
-    select * from {{ source('prod_postgresql', 'sales') }}
+    select * from {{ source('postgres_prod', 'sales') }}
 
 )
 
