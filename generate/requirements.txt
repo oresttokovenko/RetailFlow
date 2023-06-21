@@ -1,0 +1,4 @@
+pandas==2.0.1
+python-dotenv==1.0.0
+Faker==18.9.0
+SQLAlchemy==1.4.48
