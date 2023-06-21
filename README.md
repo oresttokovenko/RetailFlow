@@ -77,6 +77,9 @@ linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 ├── generate
 │   ├── Dockerfile
 │   └── generate_fake_data.py
+├── helpers
+│   ├── ascii_graphic.py
+│   └── setup.py
 ├── ingestion
 │   └── airbyte
 ├── requirements.txt
@@ -85,11 +88,13 @@ linkStyle 5 stroke:#2ecd71,stroke-width:2px;
 │   └── snowflake
 ├── terraform
 │   ├── main.tf
+│   ├── output.tf
 │   └── variables.tf
 ├── transformation
 │   ├── Dockerfile
 │   ├── dagster
-│   └── dbt
+│   ├── dbt
+│   └── requirements.txt
 └── visualization
     └── Dockerfile
 ```
