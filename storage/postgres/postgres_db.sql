@@ -1,6 +1,10 @@
+-- creating schema
+
+CREATE SCHEMA production;
+
 -- creating table
 
-CREATE TABLE sales (
+CREATE TABLE production.sales (
     order_id INTEGER,
     cust_name VARCHAR(255),
     product VARCHAR(255),

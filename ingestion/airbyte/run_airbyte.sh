@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ### this bash script will run inside of an ec2 instance ###
+### user = airbyte, pass = password ###
 
 # update and install Docker
 sudo yum update -y   

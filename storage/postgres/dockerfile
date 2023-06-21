@@ -2,9 +2,9 @@
 FROM postgres:15.3
 
 # environment variables
-ENV POSTGRES_USER myuser
-ENV POSTGRES_PASSWORD mypassword
-ENV POSTGRES_DB mydatabase
+ENV POSTGRES_USER retailflow_admin
+ENV POSTGRES_PASSWORD retailflow123
+ENV POSTGRES_DB retailflow_db
 
 # expose port
 EXPOSE 5432
