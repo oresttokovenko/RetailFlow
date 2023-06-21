@@ -71,6 +71,9 @@ cloud-dagster: ## Access the Dagster GUI through your local browswer
 cloud-snowflake: ## Access the Snowflake GUI through your local browswer
 	open https://app.snowflake.com
 
+cloud-airbyte: ## Access the Airbyte GUI through your local browswer
+	pass
+
 cloud-dbt: ## Access the Snowflake GUI through your local browswer
 	dbt docs generate
 
