@@ -109,13 +109,14 @@ You can install these requirements using the following command: `brew install do
 
 If you are unsure of your options, run `make help` 
 
-1. Run `make snowflake_config`
-2. Run `make tf-init`
-3. Run `make infra-up-cloud` and wait until you see the 'All Ready' Message
-4. Run `make cloud-airbyte` and configure the PostgresDB source and the Snowflake destination (this cannot be done programmatically)
-5. Run `make cloud-metabase` and configure the Snowflake source (this cannot be done programmatically)
-6. Explore the remainder of the project by running `cloud-dbt`, `cloud-postgres`, , `cloud-dagster`, `cloud-snowflake` or `print-lambda` to interact with the ec2 instances (port-forwarding, information, etc.)
-7. Once you are finished, run `make infra-down-cloud`
+1. Run `make setup`
+2. Run `make snowflake_config`
+3. Run `make tf-init`
+4. Run `make infra-up-cloud` and wait until you see the 'All Ready' Message
+5. Run `make cloud-airbyte` and configure the PostgresDB source and the Snowflake destination (this cannot be done programmatically)
+6. Run `make cloud-metabase` and configure the Snowflake source (this cannot be done programmatically)
+7. Explore the remainder of the project by running `cloud-dbt`, `cloud-postgres`, `cloud-dagster`, `cloud-snowflake` or `print-lambda` to interact with the ec2 instances (port-forwarding, information, etc.)
+8. Once you are finished, run `make infra-down-cloud`
 
 **NOTE**: the makefile commands below do not completely function
 

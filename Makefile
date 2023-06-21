@@ -1,7 +1,10 @@
 ####################################################################################################################
 
 help: ## Print all commands (including this one)
+	@python helpers/ascii_graphic.py
+	@sleep 1
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	
 
 ####################################################################################################################
 
@@ -42,7 +45,7 @@ sh:
 
 snowflake_config: ## Set up Snowflake credentials and prepare Snowflake for Airbyte connection
 	@echo "Please complete the following:"
-	@python setup.py
+	@python helpers/setup.py
 	@echo "Please wait while the Snowflake setup script runs"
 	@python storage/snowflake/setup_airbyte_environment.py
 	@echo "Setup script is complete - you can proceed to run `tf-init`"
