@@ -45,7 +45,7 @@ __MACOSX
 .dockerignore
 
 INSTRUCTIONS.md
-airbyte
+/airbyte/
 
 *.pem
 
