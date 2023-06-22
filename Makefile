@@ -1,12 +1,13 @@
 ####################################################################################################################
+# Help
 
 help: ## Print all commands (including this one)
 	@python helpers/ascii_graphic.py
-	@sleep 1
+	@sleep 2
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	
-
 ####################################################################################################################
+# Creating a Virtual Environment
 
 setup: ## Create a virtual environment and installs requirements
 	create-virtualenv install-requirements
@@ -19,29 +20,30 @@ install-requirements:
 	@echo "Installing requirements..."
 	. retailflow_venv/bin/activate && pip install -r requirements.txt
 
-clean: ## clean: removes the virtual environment directory
+clean: ## Remove the virtual environment directory
 	@echo "Cleaning up virtual environment..."
 	rm -rf retailflow_venv
 
 ####################################################################################################################
+# TODO: Local deployment option using docker-compose
 
+# docker-spin-up: ## Setup containers to run pipeline
+# 	docker compose --env-file env up dagster-init && docker compose --env-file env up --build -d
 
-docker-spin-up: ## Setup containers to run pipeline
-	docker compose --env-file env up dagster-init && docker compose --env-file env up --build -d
+# perms:
+# 	sudo mkdir -p logs plugins temp dags tests migrations && sudo chmod -R u=rwx,g=rwx,o=rwx logs plugins temp dags tests migrations
 
-perms:
-	sudo mkdir -p logs plugins temp dags tests migrations && sudo chmod -R u=rwx,g=rwx,o=rwx logs plugins temp dags tests migrations
+# up: 
+# 	perms docker-spin-up warehouse-migration
 
-up: 
-	perms docker-spin-up warehouse-migration
+# down:
+# 	docker compose down
 
-down:
-	docker compose down
-
-sh:
-	docker exec -ti webserver bash
+# sh:
+# 	docker exec -ti webserver bash
 
 ####################################################################################################################
+# Deploy the pipeline to the AWS cloud
 
 snowflake_config: ## Set up Snowflake credentials and prepare Snowflake for Airbyte connection
 	@echo "Please complete the following:"
@@ -50,7 +52,7 @@ snowflake_config: ## Set up Snowflake credentials and prepare Snowflake for Airb
 	@python storage/snowflake/setup_airbyte_environment.py
 	@echo "Setup script is complete - you can proceed to run `tf-init`"
 
-tf-init: ## Run `terraform init`, which needs to be run before `infra-up`
+tf-init: ## Run `terraform init` - ensure this is run before `infra-up`
 	terraform -chdir=./terraform init
 
 infra-up: ## Set up cloud infrastructure
@@ -80,14 +82,23 @@ cloud-airbyte: ## Access the Airbyte GUI through your local browswer
 cloud-dbt: ## Access the Snowflake GUI through your local browswer
 	dbt docs generate
 
-print-lambda: ## Access the Snowflake GUI through your local browswer
+print-lambda: ## Fetch the configuration details of the AWS Lambda function
 	aws lambda get-function --function-name generate_fake_data.py
 
 ####################################################################################################################
 # Helpers
 
-create_dbt_file:
+create_dbt_file: ## Create a ~/.dbt file
 	mkdir -p ~/.dbt && touch ~/.dbt/profiles.yml
 
-ssh-ec2:
+ssh-ec2-postgres: ## Connect to the EC2 instance running PostgreSQL through SSH
+	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+
+ssh-ec2-dbt-dagster:  ## Connect to the EC2 instance running dbt and Dagster through SSH
+	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+
+ssh-ec2-airbyte: ## Connect to the EC2 instance running Airbyte through SSH
+	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+
+ssh-ec2-metabase: ## ## Connect to the EC2 instance running Metabase through SSH
 	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
