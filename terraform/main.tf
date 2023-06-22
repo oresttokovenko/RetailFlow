@@ -82,6 +82,7 @@ resource "local_file" "ssh_key" {
   file_permission = 400
 }
 
+
 /*
 -------------------------------------------
 AWS Instance Configuration for PostgreSQL Database
@@ -89,14 +90,7 @@ AWS Instance Configuration for PostgreSQL Database
 This block of code creates an AWS EC2 instance, using a specific Amazon Linux 2023 AMI, and the instance type is 't2.micro'. 
 An existing key pair is attached to this instance for secure SSH access. 
 
-It uses a user data script 'install_postgres.sh' to set up PostgreSQL on the instance, and the 'pg_hba.conf' file allows 
-all IPs to connect to the database (you may want to restrict this in a production environment). 
-
-The instance is attached to a security group 'allow_ssh' that should permit SSH access. 
-
-The instance is tagged with the name 'backend_db'. 
-
-Following the resource creation, an output is defined to show the public IP address of the newly created instance.
+Following the resource creation, the public IP address is appended to .env as POSTGRES_EC2_IP_ADDRESS
 -------------------------------------------
 */
 
@@ -104,19 +98,56 @@ resource "aws_instance" "postgres_db_ec2" {
   ami                    = "ami-0ab193018f3e9351b" # amazon linux 2023 AMI
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.ssh_key.key_name
-  user_data = templatefile("storage/install_postgres.sh", {
-    pg_hba_file = templatefile("storage/pg_hba.conf", { allowed_ip = "0.0.0.0/0" }),
-  })
   vpc_security_group_ids = [aws_security_group.allow_ssh.id] # attach the security group to the instance
-
-  tags = {
-    Name = "backend_db"
-  }
 }
 
-output "instance_ip_addr" {
-  value = aws_instance.postgres_db_ec2.*.public_ip
+/*
+-------------------------------------------
+AWS Instance Configuration for Airbyte
+
+This block of code creates an AWS EC2 instance, using a specific Amazon Linux 2023 AMI, and the instance type is 't2.micro'. 
+An existing key pair is attached to this instance for secure SSH access. 
+
+Following the resource creation, the public IP address is appended to .env as AIRBYTE_EC2_IP_ADDRESS
+-------------------------------------------
+*/
+
+resource "temp" "example" {
+  count = var.create_instance ? 1 : 0
 }
+
+
+/*
+-------------------------------------------
+AWS Instance Configuration for Dagster and dbt
+
+This block of code creates an AWS EC2 instance, using a specific Amazon Linux 2023 AMI, and the instance type is 't2.micro'. 
+An existing key pair is attached to this instance for secure SSH access. 
+
+Following the resource creation, the public IP address is appended to .env as DAGSTER_DBT_EC2_IP_ADDRESS
+-------------------------------------------
+*/
+
+resource "temp" "example" {
+  count = var.create_instance ? 1 : 0
+}
+
+
+/*
+-------------------------------------------
+AWS Instance Configuration for Metabase
+
+This block of code creates an AWS EC2 instance, using a specific Amazon Linux 2023 AMI, and the instance type is 't2.micro'. 
+An existing key pair is attached to this instance for secure SSH access. 
+
+Following the resource creation, the public IP address is appended to .env as METABASE_EC2_IP_ADDRESS
+-------------------------------------------
+*/
+
+resource "temp" "example" {
+  count = var.create_instance ? 1 : 0
+}
+
 
 /*
 -------------------------------------------
@@ -140,11 +171,11 @@ provider "aws" {
   region = var.region
 }
 
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/package"
-  output_path = "${path.module}/package.zip"
-}
+# data "archive_file" "lambda_zip" {
+#   type        = "zip"
+#   source_dir  = "${path.module}/package"
+#   output_path = "${path.module}/package.zip"
+# }
 
 resource "aws_lambda_function" "fake_data_generator" {
   filename      = data.archive_file.lambda_zip.output_path
@@ -186,4 +217,24 @@ EOF
 resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+/*
+-------------------------------------------
+AWS ECS Configuration
+
+EC2 Launch Type - Manual management: You provision and manage your own EC2 instances and add them to your ECS cluster. You need to consider the instance types, sizes, number of instances, etc., based on your workloads. In this case, you need to provision the EC2 instances before ECS tasks can be run on them.
+-------------------------------------------
+*/
+
+resource "aws_ecs_task_definition" "ecs_task" {
+  family                = "service"
+  container_definitions = file("task-definitions.json")
+}
+
+resource "aws_ecs_service" "my_service" {
+  name            = "my-service"
+  cluster         = aws_ecs_cluster.my_cluster.id
+  task_definition = aws_ecs_task_definition.my_task.arn
+  depends_on = [aws_instance.ecs_instance1, aws_instance.ecs_instance2, aws_instance.ecs_instance3, aws_instance.ecs_instance4, aws_instance.ecs_instance5]
 }

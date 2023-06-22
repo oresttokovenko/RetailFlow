@@ -131,11 +131,8 @@ If you are unsure of your options, run `make help`
 
 ```shell
 
-# # set up Snowflake credentials
+# set up Snowflake credentials
 make snowflake_config
-
-# local run & test using docker-compose
-make infra-up-local # start docker containers on your computer
 
 # create AWS services with Terraform and AWS ECS
 make tf-init # only needed on your first terraform run (or if you add new providers)
@@ -164,8 +161,6 @@ make print-lambda
 After you are done, make sure to destroy your cloud infrastructure.
 
 ```shell
-# local tear down
-make infra-down-local # stop docker containers on your computer
 
 # AWS infrastructure tear down
 make infra-down-cloud # type in yes after verifying the changes TF will make
