@@ -19,4 +19,4 @@ output "public_key" {
   value       = tls_private_key.custom_key.public_key_openssh
 }
 
-# echo "EC2_URL=$(terraform output ec2_url)" >> .env
+# echo "POSTGRES_EC2_IP_ADDRESS=$(terraform output ec2_ssh_connection_url)" >> .env

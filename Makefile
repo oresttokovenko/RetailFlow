@@ -25,24 +25,6 @@ clean: ## Remove the virtual environment directory
 	rm -rf retailflow_venv
 
 ####################################################################################################################
-# TODO: Local deployment option using docker-compose
-
-# docker-spin-up: ## Setup containers to run pipeline
-# 	docker compose --env-file env up dagster-init && docker compose --env-file env up --build -d
-
-# perms:
-# 	sudo mkdir -p logs plugins temp dags tests migrations && sudo chmod -R u=rwx,g=rwx,o=rwx logs plugins temp dags tests migrations
-
-# up: 
-# 	perms docker-spin-up warehouse-migration
-
-# down:
-# 	docker compose down
-
-# sh:
-# 	docker exec -ti webserver bash
-
-####################################################################################################################
 # Deploy the pipeline to the AWS cloud
 
 snowflake_config: ## Set up Snowflake credentials and prepare Snowflake for Airbyte connection
@@ -88,17 +70,35 @@ print-lambda: ## Fetch the configuration details of the AWS Lambda function
 ####################################################################################################################
 # Helpers
 
-create_dbt_file: ## Create a ~/.dbt file
+create-dbt-file: ## Create a ~/.dbt file
 	mkdir -p ~/.dbt && touch ~/.dbt/profiles.yml
 
 ssh-ec2-postgres: ## Connect to the EC2 instance running PostgreSQL through SSH
-	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$POSTGRES_EC2_IP_ADDRESS
 
-ssh-ec2-dbt-dagster:  ## Connect to the EC2 instance running dbt and Dagster through SSH
-	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+ssh-ec2-dbt-dagster: ## Connect to the EC2 instance running dbt and Dagster through SSH
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$DBT_DAGSTER_EC2_IP_ADDRESS
 
 ssh-ec2-airbyte: ## Connect to the EC2 instance running Airbyte through SSH
-	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$AIRBYTE_EC2_IP_ADDRESS
 
-ssh-ec2-metabase: ## ## Connect to the EC2 instance running Metabase through SSH
-	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) && rm private_key.pem
+ssh-ec2-metabase: ## Connect to the EC2 instance running Metabase through SSH
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$METABASE_EC2_IP_ADDRESS
+
+####################################################################################################################
+# TODO: Local deployment option using docker-compose
+
+# docker-spin-up: ## Setup containers to run pipeline
+# 	docker compose --env-file env up dagster-init && docker compose --env-file env up --build -d
+
+# perms:
+# 	sudo mkdir -p logs plugins temp dags tests migrations && sudo chmod -R u=rwx,g=rwx,o=rwx logs plugins temp dags tests migrations
+
+# up: 
+# 	perms docker-spin-up warehouse-migration
+
+# down:
+# 	docker compose down
+
+# sh:
+# 	docker exec -ti webserver bash

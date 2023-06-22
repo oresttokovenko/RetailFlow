@@ -120,38 +120,6 @@ output "instance_ip_addr" {
 
 /*
 -------------------------------------------
-Configuration and Resource Creation for Snowflake 
-
-The role for the account is set as 'ACCOUNTADMIN', a role named 'EXAMPLE_ROLE' is created on Snowflake, a new database 'EXAMPLE_DATABASE' is also created on Snowflake, and a schema named 'EXAMPLE_SCHEMA' is then created within the database, with an attached comment that describes its purpose. 
-
-Finally, USAGE privileges on this schema are granted to 'EXAMPLE_ROLE'. 
-This allows the role to access and interact with the schema.
--------------------------------------------
-*/
-
-resource "snowflake_role" "example_role" {
-  name = "EXAMPLE_ROLE"
-}
-
-resource "snowflake_database" "example_database" {
-  name = "EXAMPLE_DATABASE"
-}
-
-resource "snowflake_schema" "example_schema" {
-  name = "EXAMPLE_SCHEMA"
-  database = snowflake_database.example_database.name
-  comment = "A schema for our example data"
-}
-
-resource "snowflake_schema_grant" "example_role_schema" {
-  schema_name = snowflake_schema.example_schema.name
-  database_name = snowflake_database.example_database.name
-  privilege = "USAGE"
-  roles = [snowflake_role.example_role.name]
-}
-
-/*
--------------------------------------------
 Creating a Lambda Function with IAM Role in AWS
 
 1. Packs the source code present in the 'package' directory into a ZIP file. This ZIP file is used as deployment package for the Lambda function.
@@ -186,7 +154,7 @@ resource "aws_lambda_function" "fake_data_generator" {
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
-  runtime = "python3.8"
+  runtime = "python3.10"
 
   environment {
     variables = {
