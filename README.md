@@ -112,55 +112,12 @@ You can install these requirements using the following command: `brew install do
 
 ## Instructions
 
-If you are unsure of your options, run `make help` 
+To see a full list of commands, run `make help` 
 
-1. Run `make setup`
-2. Run `make snowflake_config`
+1. Run `make env-setup`
+2. Run `make initial_config`
 3. Run `make infra-up` and wait until you see the 'All Ready' Message
-4. Run `make cloud-airbyte` and configure the PostgresDB source and the Snowflake destination (this cannot be done programmatically)
-5. Run `make cloud-metabase` and configure the Snowflake source (this cannot be done programmatically)
-6. Explore the remainder of the project by running `cloud-dbt`, `cloud-postgres`, `cloud-dagster`, `cloud-snowflake` or `print-lambda` to interact with the ec2 instances (port-forwarding, information, etc.)
+4. Run `port-forwarding-airbyte` and configure the PostgresDB source and the Snowflake destination (this cannot be done programmatically)
+5. Run `port-forwarding-metabase` and configure the Snowflake source (this cannot be done programmatically)
+6. Explore the remainder of the project by running `port-forwarding-dbt`, `ssh-postgres`, `port-forwarding-dagster`, `open-snowflake` or `print-lambda` to interact with the ec2 instances (port-forwarding, ssh, information, etc.)
 7. Once you are finished, run `make infra-down`
-
-**NOTE**: the makefile commands below do not completely function
-
-## Commands
-
-### Provision
-
-```shell
-
-# set up Snowflake credentials
-make snowflake_config
-
-# create AWS services with Terraform and AWS ECS
-make tf-init # only needed on your first terraform run (or if you add new providers)
-make infra-up-cloud # type in yes after verifying the changes TF will make
-
-# this command will forward Postgres port from EC2 to your machine and opens pgadmin in the browser
-make cloud-postgres 
-# the user name and password are both admin
-
-# this command will forward Dagster port from EC2 to your machine and opens it in the browser
-make cloud-dagster 
-# the user name and password are both admin
-
-# this command will forward Metabase port from EC2 to your machine and opens it in the browser
-make cloud-metabase 
-
-# this command will forward dbt port from EC2 to your machine and opens it in the browser
-make cloud-dbt
-
-# this command will print information about the lambda function in the console
-make print-lambda
-```
-
-### Tear Down
-
-After you are done, make sure to destroy your cloud infrastructure.
-
-```shell
-
-# AWS infrastructure tear down
-make infra-down-cloud # type in yes after verifying the changes TF will make
-```

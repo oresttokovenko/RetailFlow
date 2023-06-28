@@ -21,7 +21,7 @@ help: ## Print all commands (including this one)
 ####################################################################################################################
 # Creating a Virtual Environment
 
-setup: ## Create a virtual environment and installs requirements
+env-setup: ## Create a virtual environment and installs requirements
 	create-virtualenv install-requirements
 
 create-virtualenv:
