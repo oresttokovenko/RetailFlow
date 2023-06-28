@@ -1,3 +1,5 @@
+open('.env_lambda', 'a').close()
+
 snowflake_user = input("Enter Snowflake username: ")
 snowflake_pass = input("Enter Snowflake password: ")
 snowflake_account_id = input("Enter Snowflake account_id: (ex. E9VQG1LF-HBGF7017) ")

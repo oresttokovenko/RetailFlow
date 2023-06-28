@@ -1,4 +1,16 @@
 ####################################################################################################################
+# Vars
+
+bold := "\033[1m"
+normal := "\033[0m"
+
+TERRAFORM_MAIN := terraform/main
+TERRAFORM_LAMBDA := terraform/lambda
+LAMBDA_DIR := generate
+TAG := ?
+ECR_REPO := ?
+
+####################################################################################################################
 # Help
 
 help: ## Print all commands (including this one)
@@ -12,7 +24,7 @@ help: ## Print all commands (including this one)
 setup: ## Create a virtual environment and installs requirements
 	create-virtualenv install-requirements
 
-create-virtualenv: 
+create-virtualenv:
 	@echo "Creating virtual environment with python3.10..."
 	test -d retailflow_venv || python3.10 -m venv retailflow_venv
 
@@ -27,42 +39,85 @@ clean: ## Remove the virtual environment directory
 ####################################################################################################################
 # Deploy the pipeline to the AWS cloud
 
-snowflake_config: ## Set up Snowflake credentials and prepare Snowflake for Airbyte connection
-	@echo "Please complete the following:"
+initial_config:
+	snowflake_config build-containers
+
+snowflake_config:
+	@echo $(bold)"Please complete the following:"$(normal)
 	@python helpers/setup.py
-	@echo "Please wait while the Snowflake setup script runs"
+	@echo $(bold)"Please wait while the Snowflake setup script runs"$(normal)
 	@python storage/snowflake/setup_airbyte_environment.py
-	@echo "Setup script is complete - you can proceed to run `tf-init`"
+	@echo $(bold)"Setup script is complete"$(normal)
 
-tf-init: ## Run `terraform init` - ensure this is run before `infra-up`
-	terraform -chdir=./terraform init
+build-containers: 
+	export $(grep -v '^#' .env | xargs) && \
+	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com
+	docker build -t postgres_container -f storage/postgres/Dockerfile .
+	docker build -t dbt_dagster_container -f transformation/Dockerfile .
+	docker build -t metabase_container -f visualization/Dockerfile .
+	docker tag postgres_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
+	docker tag dbt_dagster_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
+	docker tag metabase_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
 
-infra-up: ## Set up cloud infrastructure
-	terraform -chdir=./terraform apply
+infra-up: ## Set up all cloud infrastructure
+	ec2 lambda airbyte_run_command
 
-infra-down: ## Destroy cloud infrastructure
-	terraform -chdir=./terraform destroy
+airbyte_run_command:
+	@chmod +x ingestion/airbyte/run_airbyte.sh
 
-infra-config:
-	terraform -chdir=./terraform output
+ec2:
+	@cd $(TERRAFORM_MAIN) && \
+	terraform init && \
+	terraform apply -auto-approve
+	@echo $(bold)"EC2 instances created"$(normal)
+
+lambda:
+	@echo $(bold)"Generating Lambda package..."$(normal)
+	@mkdir -p $(LAMBDA_DIR)/package && \
+	pip install -q -r $(LAMBDA_DIR)/requirements.txt -t $(LAMBDA_DIR)/package/ && \
+	cp .env_lambda $(LAMBDA_DIR)/package/ && \
+	cp $(LAMBDA_DIR)/generate_fake_data.py $(LAMBDA_DIR)/package/ && \
+	cd $(LAMBDA_DIR)/package/ && \
+	zip -r ../lambda.zip .
+	@echo $(bold)"Lambda package created"$(normal)
+
+	@cd $(TERRAFORM_LAMBDA) && \
+	terraform init && \
+	terraform apply -auto-approve
+	@echo $(bold)"Lambda function created"$(normal)
+
+infra-down: ## Destroy all cloud infrastructure
+	@rm -rf $(LAMBDA_DIR)/package $(LAMBDA_DIR)/lambda.zip
+	@cd $(TERRAFORM_MAIN) && terraform destroy -auto-approve
+	@cd $(LAMBDA_DIR) && terraform destroy -auto-approve
 
 ####################################################################################################################
 # Port forwarding to local machine
 
-cloud-metabase: ## Access the Metabase GUI through your local browswer
-	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o "IdentitiesOnly yes" -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) -N -f -L 3001:$$(terraform -chdir=./terraform output -raw ec2_public_dns):3000 && open http://localhost:3001 && rm private_key.pem
+# NOTE: the export $(grep -v '^#' .env | xargs) command is used to extract variable assignments from the .env file and export them as environment variables
 
-cloud-dagster: ## Access the Dagster GUI through your local browswer
-	terraform -chdir=./terraform output -raw private_key > private_key.pem && chmod 600 private_key.pem && ssh -o "IdentitiesOnly yes" -i private_key.pem ubuntu@$$(terraform -chdir=./terraform output -raw ec2_public_dns) -N -f -L 8081:$$(terraform -chdir=./terraform output -raw ec2_public_dns):8080 && open http://localhost:8081 && rm private_key.pem
+port-forwarding-metabase: ## Access the Metabase GUI through your local browswer
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" -L 3000:localhost:3000 ec2-user@$$METABASE_EC2_IP_ADDRESS
+	open http://localhost:3000
 
-cloud-snowflake: ## Access the Snowflake GUI through your local browswer
+port-forwarding-dagster: ## Access the Dagster GUI through your local browswer
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" -L 3000:localhost:3001 ec2-user@$$DBT_DAGSTER_EC2_IP_ADDRESS
+	open http://localhost:3001
+
+open-snowflake: ## Access the Snowflake GUI through your local browswer
 	open https://app.snowflake.com
 
-cloud-airbyte: ## Access the Airbyte GUI through your local browswer
-	pass
+port-forwarding-airbyte: ## Access the Airbyte GUI through your local browswer
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" -L 8000:localhost:8000 ec2-user@$$DBT_DAGSTER_EC2_IP_ADDRESS
+	open http://localhost:8000
 
-cloud-dbt: ## Access the Snowflake GUI through your local browswer
-	dbt docs generate
+port-forwarding-dbt: ## Access the Snowflake GUI through your local browswer
+	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" -L 8080:localhost:8080 ec2-user@$$DBT_DAGSTER_EC2_IP_ADDRESS
+	open http://localhost:8080
+	# dbt docs generate
 
 print-lambda: ## Fetch the configuration details of the AWS Lambda function
 	aws lambda get-function --function-name generate_fake_data.py
@@ -70,20 +125,26 @@ print-lambda: ## Fetch the configuration details of the AWS Lambda function
 ####################################################################################################################
 # Helpers
 
+# NOTE: the export $(grep -v '^#' .env | xargs) command is used to extract variable assignments from the .env file and export them as environment variables
+
 create-dbt-file: ## Create a ~/.dbt file
 	mkdir -p ~/.dbt && touch ~/.dbt/profiles.yml
 
 ssh-ec2-postgres: ## Connect to the EC2 instance running PostgreSQL through SSH
 	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$POSTGRES_EC2_IP_ADDRESS
+	@echo $(bold)"SSH Tunnel created"$(normal)
 
 ssh-ec2-dbt-dagster: ## Connect to the EC2 instance running dbt and Dagster through SSH
 	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$DBT_DAGSTER_EC2_IP_ADDRESS
+	@echo $(bold)"SSH Tunnel created"$(normal)
 
 ssh-ec2-airbyte: ## Connect to the EC2 instance running Airbyte through SSH
 	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$AIRBYTE_EC2_IP_ADDRESS
+	@echo $(bold)"SSH Tunnel created"$(normal)
 
 ssh-ec2-metabase: ## Connect to the EC2 instance running Metabase through SSH
 	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$METABASE_EC2_IP_ADDRESS
+	@echo $(bold)"SSH Tunnel created"$(normal)
 
 ####################################################################################################################
 # TODO: Local deployment option using docker-compose

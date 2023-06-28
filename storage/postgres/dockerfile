@@ -6,5 +6,8 @@ ENV POSTGRES_USER retailflow_admin
 ENV POSTGRES_PASSWORD retailflow123
 ENV POSTGRES_DB retailflow_db
 
+# copying the startup script to the /docker-entrypoint-initdb.d/ directory
+COPY postgres_db.sql /docker-entrypoint-initdb.d/
+
 # expose port
 EXPOSE 5432

@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 
 # getting connection string for ec2 instance
-load_dotenv()
+load_dotenv('.env_lambda')
 ec2_connection_url = os.getenv('EC2_CONNECTION_URL')
 
 # using Canadian references
@@ -82,9 +82,9 @@ def generate_fake_data():
 # attempting to establish a database connection
 def create_db_connection():
     try:
-        # TODO: update to connect to dynamic ec2 connection string
-        engine = create_engine("postgresql://retailflow_admin:retailflow123@localhost:5432/retailflow_db")
-        # engine = create_engine(f"postgresql://retailflow_admin:retailflow123@{ec2_connection_url}:5432/retailflow_db")
+        # for local connection - engine = create_engine("postgresql://retailflow_admin:retailflow123@localhost:5432/retailflow_db")
+        engine = create_engine(f"postgresql://retailflow_admin:retailflow123@{ec2_connection_url}:5432/retailflow_db")
+        print(f"connection url = postgresql://retailflow_admin:retailflow123@{ec2_connection_url}:5432/retailflow_db")
         print("creating db connection...")
         # Try to connect to the database
         connection = engine.connect()
