@@ -1,13 +1,13 @@
 retailflow_transformation:
   outputs:
     dev:
-      account: GFVFGHL-QEB71907
-      database: DBT_PROD
-      password: toQput-2cikzy-fumgoc
-      role: RETAILFLOWADMIN
-      schema: DBT_PROD
-      threads: 1
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
+      threads: "{{ env_var('SNOWFLAKE_THREADS') }}"
       type: snowflake
-      user: RETAILFLOWADMIN
-      warehouse: COMPUTE_WH
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
   target: dev

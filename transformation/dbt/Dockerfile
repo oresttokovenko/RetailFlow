@@ -15,6 +15,10 @@ WORKDIR $DBT_DIR
 
 # Copy requirements
 COPY requirements.txt .
+COPY .env .
+
+# Load environment variables
+RUN export $(cat .env | xargs)
 
 # Install dbt
 RUN pip install -U pip
