@@ -6,9 +6,10 @@ normal := "\033[0m"
 
 TERRAFORM_MAIN := terraform/main
 TERRAFORM_LAMBDA := terraform/lambda
+TERRAFORM_ECR := terraform/ecr
 LAMBDA_DIR := generate
-TAG := ?
-ECR_REPO := ?
+TAG := retailflow
+ECR_REPO := retailflow
 
 ####################################################################################################################
 # Help
@@ -19,9 +20,9 @@ help: ## Print all commands (including this one)
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	
 ####################################################################################################################
-# Creating a Virtual Environment
+# Create a Virtual Environment
 
-env-setup: ## Create a virtual environment and installs requirements
+venv-setup: ## Create a virtual environment and installs requirements
 	create-virtualenv install-requirements
 
 create-virtualenv:
@@ -37,36 +38,58 @@ clean: ## Remove the virtual environment directory
 	rm -rf retailflow_venv
 
 ####################################################################################################################
-# Deploy the pipeline to the AWS cloud
+# Set up the Snowflake settings and Container Registry
 
-initial_config:
-	snowflake_config build-containers
+initial_config: ## Setup up related to Containers, Container Orchestration, and Snowflake
+	main_config build-containers
 
-snowflake_config:
+main_config:
 	@echo $(bold)"Please complete the following:"$(normal)
-	@python helpers/setup.py
-	@echo $(bold)"Please wait while the Snowflake setup script runs"$(normal)
-	@python storage/snowflake/setup_airbyte_environment.py
-	@echo $(bold)"Setup script is complete"$(normal)
+	@python helpers/setup_credentials.py
+	@echo $(bold)"Please wait while the setup script runs..."$(normal)
+	@python helpers/setup_airbyte_environment.py
+	@echo $(bold)"Snowflake permissions are set, updating ECS JSON files..."$(normal)
+	@python helpers/update_ecs_json.py
+	@echo $(bold)"ECS JSON files are updated"$(normal)
 
 build-containers: 
 	export $(grep -v '^#' .env | xargs) && \
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com
-	docker build -t postgres_container -f storage/postgres/Dockerfile .
-	docker build -t dbt_dagster_container -f transformation/Dockerfile .
-	docker build -t metabase_container -f visualization/Dockerfile .
-	docker tag postgres_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
-	docker tag dbt_dagster_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
-	docker tag metabase_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
-	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
-	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
-	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):$(TAG)
+	
+	docker build -t postgres_container -f storage/postgres
+	docker build -t metabase_container -f visualization
+	docker-compose -f transformation/docker-compose.yml build
 
-infra-up: ## Set up all cloud infrastructure
-	ec2 lambda airbyte_run_command
+####################################################################################################################
+# Deploy the pipeline to the AWS cloud
 
-airbyte_run_command:
+infra-up: ## Set up all cloud infrastructure (Terraform,ECR,ECS,EC2,etc.)
+	airbyte-run-command create-ecr-repo push-containers ec2 lambda
+
+airbyte-run-command:
 	@chmod +x ingestion/airbyte/run_airbyte.sh
+
+create-ecr-repo:
+	@cd $(TERRAFORM_ECR) && \
+	terraform init && \
+	terraform apply -auto-approve
+	@echo $(bold)"ECR respository created"$(normal)
+
+push-containers:
+	docker tag postgres_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):postgres_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):postgres_$(TAG)
+
+	docker tag metabase_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):metabase_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):metabase_$(TAG)
+
+	docker tag dagit:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagit_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagit_$(TAG)
+
+	docker tag daemon:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):daemon_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):daemon_$(TAG)
+
+	docker tag postgresql:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):postgresql_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):postgresql_$(TAG)
 
 ec2:
 	@cd $(TERRAFORM_MAIN) && \
@@ -145,21 +168,3 @@ ssh-ec2-airbyte: ## Connect to the EC2 instance running Airbyte through SSH
 ssh-ec2-metabase: ## Connect to the EC2 instance running Metabase through SSH
 	export $(grep -v '^#' .env | xargs) && ssh -i "terraform/tf_key.pem" ec2-user@$$METABASE_EC2_IP_ADDRESS
 	@echo $(bold)"SSH Tunnel created"$(normal)
-
-####################################################################################################################
-# TODO: Local deployment option using docker-compose
-
-# docker-spin-up: ## Setup containers to run pipeline
-# 	docker compose --env-file env up dagster-init && docker compose --env-file env up --build -d
-
-# perms:
-# 	sudo mkdir -p logs plugins temp dags tests migrations && sudo chmod -R u=rwx,g=rwx,o=rwx logs plugins temp dags tests migrations
-
-# up: 
-# 	perms docker-spin-up warehouse-migration
-
-# down:
-# 	docker compose down
-
-# sh:
-# 	docker exec -ti webserver bash

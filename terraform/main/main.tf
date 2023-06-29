@@ -118,7 +118,7 @@ resource "aws_instance" "airbyte_ec2" {
 
 /*
 -------------------------------------------
-AWS Instance Configuration for Dagster and dbt
+AWS Instance Configuration for Dagster
 
 This block of code creates an AWS EC2 instance, using a specific Amazon Linux 2023 AMI, and the instance type is 't2.micro'. 
 An existing key pair is attached to this instance for secure SSH access. 
@@ -127,7 +127,25 @@ Following the resource creation, the public IP address is appended to .env as DA
 -------------------------------------------
 */
 
-resource "aws_instance" "dbt_dagster_ec2" {
+resource "aws_instance" "dagster_ec2" {
+  ami                    = "ami-0ab193018f3e9351b" # amazon linux 2023 AMI
+  instance_type          = "t2.micro"
+  key_name               = aws_key_pair.ssh_key.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id] # attach the security group to the instance
+}
+
+/*
+-------------------------------------------
+AWS Instance Configuration for dbt
+
+This block of code creates an AWS EC2 instance, using a specific Amazon Linux 2023 AMI, and the instance type is 't2.micro'. 
+An existing key pair is attached to this instance for secure SSH access. 
+
+Following the resource creation, the public IP address is appended to .env as DAGSTER_DBT_EC2_IP_ADDRESS
+-------------------------------------------
+*/
+
+resource "aws_instance" "dbt_ec2" {
   ami                    = "ami-0ab193018f3e9351b" # amazon linux 2023 AMI
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.ssh_key.key_name
@@ -152,24 +170,6 @@ resource "aws_instance" "metabase_ec2" {
   key_name               = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.allow_ssh.id] # attach the security group to the instance
 }
-
-/*
--------------------------------------------
-AWS ECR Configuration
-
-Creating ECR Repository to store Docker containers
--------------------------------------------
-*/
-
-resource "aws_ecr_repository" "ecr" {
-  name                 = "retailflow"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
-
 /*
 -------------------------------------------
 AWS ECS Configuration

@@ -2,6 +2,8 @@ from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
 
+SQLALCHEMY_SILENCE_UBER_WARNING=1
+
 # getting connection string for snowflake instance
 load_dotenv()
 user = os.getenv("SNOWFLAKE_USERNAME")

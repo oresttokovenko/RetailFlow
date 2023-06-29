@@ -1,0 +1,13 @@
+retailflow_transformation:
+  outputs:
+    dev:
+      account: GFVFGHL-QEB71907
+      database: DBT_PROD
+      password: toQput-2cikzy-fumgoc
+      role: RETAILFLOWADMIN
+      schema: DBT_PROD
+      threads: 1
+      type: snowflake
+      user: RETAILFLOWADMIN
+      warehouse: COMPUTE_WH
+  target: dev

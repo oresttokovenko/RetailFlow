@@ -51,7 +51,9 @@ provisioner "local-exec" {
 
 # echo "POSTGRES_EC2_IP_ADDRESS=$(terraform output ec2_ssh_connection_url)" >> .env
 
-# echo "DBT_DAGSTER_EC2_IP_ADDRESS=$(terraform output ec2_ssh_connection_url)" >> .env
+# echo "DBT_EC2_IP_ADDRESS=$(terraform output ec2_ssh_connection_url)" >> .env
+
+# echo "DAGSTER_EC2_IP_ADDRESS=$(terraform output ec2_ssh_connection_url)" >> .env
 
 # echo "AIRBYTE_EC2_IP_ADDRESS=$(terraform output ec2_ssh_connection_url)" >> .env
 
