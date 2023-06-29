@@ -2,12 +2,12 @@ retailflow_transformation:
   outputs:
     dev:
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
-      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      database: DBT_PROD
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
-      schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
-      threads: "{{ env_var('SNOWFLAKE_THREADS') }}"
+      schema: SNOWFLAKE_ROLE
+      threads: 1
       type: snowflake
       user: "{{ env_var('SNOWFLAKE_USER') }}"
-      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
+      warehouse: COMPUTE_WH
   target: dev

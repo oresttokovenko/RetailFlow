@@ -9,6 +9,16 @@ variable "aws_availability_zone" {
   default = "us-west-2a"
 }
 
+variable "ecs_optimized_ami" { # var.ecs_optimized_ami
+  type    = string
+  default = "ami-0cbd4a3fa79e3b362"
+}
+
+variable "ec2_size" { # var.ec2_size
+  type    = string
+  default = "t2.medium"
+}
+
 # variable "public_key_path" {
 #   description = "Path to the public key used for SSH access"
 #   type        = string

@@ -10,3 +10,9 @@ with open(".env", "w") as f:
     f.write(f"SNOWFLAKE_PASSWORD={snowflake_pass}\n")
     f.write(f"SNOWFLAKE_USERNAME={snowflake_user}\n")
     f.write(f"AWS_ACCOUNT_ID={aws_account_id}\n")
+
+with open(".transformation/dbt/.env", "w") as f:
+    f.write(f"SNOWFLAKE_ACCOUNT={snowflake_account_id}\n")
+    f.write(f"SNOWFLAKE_PASSWORD={snowflake_pass}\n")
+    f.write(f"SNOWFLAKE_USERNAME={snowflake_user}\n")
+    f.write(f"SNOWFLAKE_ROLE={snowflake_user}\n")

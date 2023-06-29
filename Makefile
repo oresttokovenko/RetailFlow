@@ -55,10 +55,11 @@ main_config:
 build-containers: 
 	export $(grep -v '^#' .env | xargs) && \
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com
-	
+
 	docker build -t postgres_container -f storage/postgres
 	docker build -t metabase_container -f visualization
-	docker-compose -f transformation/docker-compose.yml build
+	docker build -t dbt_container -f transformation/dbt
+	docker-compose -f transformation/dagster/docker-compose.yml build
 
 ####################################################################################################################
 # Deploy the pipeline to the AWS cloud
@@ -82,14 +83,17 @@ push-containers:
 	docker tag metabase_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):metabase_$(TAG)
 	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):metabase_$(TAG)
 
-	docker tag dagit:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagit_$(TAG)
+	docker tag dagit_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagit_$(TAG)
 	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagit_$(TAG)
 
-	docker tag daemon:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):daemon_$(TAG)
+	docker tag daemon_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):daemon_$(TAG)
 	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):daemon_$(TAG)
 
-	docker tag postgresql:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):postgresql_$(TAG)
-	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):postgresql_$(TAG)
+	docker tag dagster_postgresql_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagster_postgresql_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dagster_postgresql_$(TAG)
+
+	docker tag dbt_container:$(TAG) $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dbt_container_$(TAG)
+	docker push $$AWS_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/$(ECR_REPO):dbt_container_$(TAG)
 
 ec2:
 	@cd $(TERRAFORM_MAIN) && \

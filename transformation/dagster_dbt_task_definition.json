@@ -1,0 +1,48 @@
+[
+  {
+    "name": "dagit",
+    "image": "123456789013.dkr.ecr.us-west-2.amazonaws.com/dagit_container:latest",
+    "cpu": 475,
+    "memory": 875,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 3000,
+        "hostPort": 3000
+      }
+    ]
+  },
+  {
+    "name": "daemon",
+    "image": "123456789013.dkr.ecr.us-west-2.amazonaws.com/daemon_container:latest",
+    "cpu": 475,
+    "memory": 875,
+    "essential": true
+  },
+  {
+    "name": "postgresql",
+    "image": "123456789013.dkr.ecr.us-west-2.amazonaws.com/dagster_postgresql_container:latest",
+    "cpu": 475,
+    "memory": 875,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 5432,
+        "hostPort": 5432
+      }
+    ]
+  },
+  {
+    "name": "dbt",
+    "image": "123456789013.dkr.ecr.us-west-2.amazonaws.com/dbt_container:latest",
+    "cpu": 475,
+    "memory": 875,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 1000,
+        "hostPort": 1000
+      }
+    ]
+  }
+]

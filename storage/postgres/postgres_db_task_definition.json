@@ -1,32 +1,32 @@
 {
-    "family": "postgres-task-definition",
-    "containerDefinitions": [
+  "family": "postgres-task-definition",
+  "containerDefinitions": [
+    {
+      "name": "postgres-container",
+      "image": "123456789013.dkr.ecr.us-west-2.amazonaws.com/postgres_container:latest",
+      "cpu": 10,
+      "memory": 500,
+      "essential": true,
+      "portMappings": [
         {
-            "name": "postgres-container",
-            "image": "123456789013.dkr.ecr.us-west-2.amazonaws.com/postgres_container:latest",
-            "cpu": 10,
-            "memory": 500,
-            "essential": true,
-            "portMappings": [
-                {
-                    "containerPort": 5432,
-                    "hostPort": 5432
-                }
-            ],
-            "logConfiguration": {
-                "logDriver": "awslogs",
-                "options": {
-                    "awslogs-group": "/ecs/postgres-task-definition",
-                    "awslogs-region": "us-west-2",
-                    "awslogs-stream-prefix": "ecs"
-                }
-            }
+          "containerPort": 5432,
+          "hostPort": 5432
         }
-    ],
-    "requiresCompatibilities": [
-        "EC2"
-    ],
-    "networkMode": "bridge",
-    "cpu": "256",
-    "memory": "512"
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/postgres-task-definition",
+          "awslogs-region": "us-west-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "networkMode": "bridge",
+  "cpu": "256",
+  "memory": "512"
 }
