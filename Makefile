@@ -40,10 +40,10 @@ clean: ## Remove the virtual environment directory
 ####################################################################################################################
 # Set up the Snowflake settings and Container Registry
 
-initial_config: ## Setup up related to Containers, Container Orchestration, and Snowflake
+initial-config: ## Setup up related to Containers, Container Orchestration, and Snowflake
 	main_config build-containers
 
-main_config:
+main-config:
 	@echo $(bold)"Please complete the following:"$(normal)
 	@python helpers/setup_credentials.py
 	@echo $(bold)"Please wait while the setup script runs..."$(normal)
