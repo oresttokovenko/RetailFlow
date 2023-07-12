@@ -80,9 +80,9 @@ You can install these requirements using the following command: `brew install do
 To see a full list of commands, run `make help` 
 
 1. Run `make venv-setup` to create your virtual environment
-2. Run `initial-config` to set up everything related to containers, container orchestration, permissions, etc.
+2. Run `make initial-config` to set up everything related to containers, container orchestration, permissions, etc.
 3. Run `make infra-up` to depoy the pipeline to AWS and wait until you see the 'All Ready' Message
-4. Run `port-forwarding-airbyte` and configure the PostgresDB source and the Snowflake destination (this cannot be done programmatically)
-5. Run `port-forwarding-metabase` and configure the Snowflake source (this cannot be done programmatically)
-6. Explore the remainder of the project by running `port-forwarding-dbt`, `ssh-postgres`, `port-forwarding-dagster`, `open-snowflake` or `print-lambda` to interact with the ec2 instances (port-forwarding, ssh, information, etc.)
+4. Run `make port-forwarding-airbyte` and configure the PostgresDB source and the Snowflake destination (this cannot be done programmatically)
+5. Run `make port-forwarding-metabase` and configure the Snowflake source (this cannot be done programmatically)
+6. Explore the remainder of the project by running `make port-forwarding-dbt`, `make ssh-postgres`, `make port-forwarding-dagster`, `make open-snowflake` or `make print-lambda` to interact with the ec2 instances (port-forwarding, ssh, information, etc.)
 7. Once you are finished, run `make infra-down`
